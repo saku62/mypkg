@@ -1,31 +1,13 @@
 name: test
 on: push
-
 jobs:
   test:
     runs-on: ubuntu-22.04
     container: ryuichiueda/ubuntu22.04-ros2:latest
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set up Python
-        run: |
-          apt-get update
-          apt-get install -y python3 python3-pip
-          export COLCON_PYTHON_EXECUTABLE=$(which python3)
-
-      - name: Install ROS 2 dependencies
-        run: |
-          rosdep update
-          rosdep install --from-paths src --ignore-src -r -y
-
-      - name: Sync source code
+      - name: build and test
         run: |
           rsync -av ./ /root/ros2_ws/src/mypkg/
           cd /root/ros2_ws
-
-      - name: Run test script
-        run: |
           bash -xv ./src/mypkg/test/test.bash /root
-

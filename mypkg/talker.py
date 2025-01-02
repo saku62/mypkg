@@ -1,21 +1,25 @@
+#!/usr/bin/python3
+# SPDX-FileCopyrightText: 2024 Yuta Sakusabe <s23c1062mq@s.chibakoudai.jp>
+# SPDX-License-Identifier: BSD-3-Clause
+
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Int16
+from std_msgs.msg import Float32
+import psutil
 
 rclpy.init()
 node = Node("talker")
-pub = node.create_publisher(Int16, "countup", 10)
-n = 0
-
+pub = node.create_publisher(Float32, "cpu_usage", 10)
 
 def cb():
-    global n
-    msg = Int16()
-    msg.data = n
+    # 現在のCPU使用率を取得
+    cpu_usage = psutil.cpu_percent(interval=None)  # interval=Noneで直近の平均を取得
+    msg = Float32()
+    msg.data = cpu_usage
     pub.publish(msg)
-    n += 1
-
+    print(f"CPU Usage: {msg.data}%")
 
 def main():
-    node.create_timer(0.5, cb)
+    # 1秒ごとにCPU使用率を取得して送信
+    node.create_timer(1.0, cb)
     rclpy.spin(node)
